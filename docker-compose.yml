@@ -1,0 +1,76 @@
+version: '3.7'
+
+services:
+# ----------------------------------------- app ------------------------------------------
+  ltm-nest-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: ltm-nest-app
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '2000:3000'
+    depends_on:
+      - 'ltm-nest-postgres'
+      - 'ltm-nest-redis'
+      - 'ltm-nest-rabbitmq'
+    networks:
+      - ltm-network
+
+
+# ------------------------------------- db ---------------------------------------
+  ltm-nest-mongodb:
+    container_name: ltm-nest-mongo
+    image: mongo
+    volumes:
+      - ./data/data:/data/db
+    ports:
+      - "2001:27017"
+    restart: unless-stopped
+    networks:
+      - ltm-network
+    
+  ltm-nest-postgres:
+    container_name: 'ltm-nest-postgres'
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ltm-nest-db
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/postgres:/data/postgres
+    ports:
+      - "2002:5432"
+    networks:
+      - ltm-network
+
+  ltm-nest-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'ltm-nest-rabbitmq'
+    ports:
+      - 2003:5672
+      - 2004:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq2023
+    networks:
+      - ltm-network
+    
+  ltm-nest-redis:
+    image: redis:latest
+    container_name: ltm-nest-redis
+    ports:
+      - '2005:6379'
+    volumes:
+      - ./data/cache:/var/cache/redis
+    networks:
+      - ltm-network
+
+networks:
+  ltm-network:
