@@ -29,4 +29,4 @@ import { RedisClientService } from './services/redis.service';
   ],
   exports: [ConfigService, CommonService, RedisClientService],
 })
-export class CommonModule {}
+export class SharedModule {}
