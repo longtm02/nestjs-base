@@ -21,8 +21,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api/docs', app, document);
 
-  const databaseModule: DatabaseModule = new DatabaseModule();
-  await databaseModule.runMigrations(configService);
+  // const databaseModule: DatabaseModule = new DatabaseModule();
 
   app.enableCors();
   app.useStaticAssets(join(__dirname, '..', 'public'));
